@@ -1,0 +1,422 @@
+----------------------------------------------------------------------
+|                      COMP 15 HOMEWORK 1: LISTS                     |
+| Roger A. Burtonpatel                                               |
+| 3/09/2021                                                          |
+----------------------------------------------------------------------
+
+                           ---- PURPOSE ----
+This program implements a Reverse Polish Notation (RPN) calculator,
+which can take ints, booleans, or "rstrings" - special strings built for
+the calculator which can be used for multi-command execution or file 
+reading. The calculator can be manipulated with a suite of commands from the
+command line, implemented through the RPNCalc class. The program also includes
+the DatumStack class, which is used to implement the stack-based storage body of
+the calculator. It furthermore includes tests of DatumStack.cpp in the form of 
+DatumStack_tests.cpp, as well as main.cpp, the driver for CalcYouLater, and
+five .cyl files used for testing the calculator.  
+
+
+                      ---- ACKNOWLEDGEMENTS ----
+
+Akash- using DatumStack as a private member of RPNCalc + check-off. 
+
+Sam R- explaining parseRString. After talking with him, I understood the 
+purpose of the function. 
+
+
+Christopher Herr- throw and catch explanation, very helpful. 
+
+Grace Ye- More elegant implementation of rpn_exec(). 
+
+Ed Bielawa- Abstract discussion of file command which was very 
+englightening and led me to catch a bug. Also helped me with 
+a unique case in which multiple reads happen with an rstring in a 
+file. Thank you! 
+
+Alessandra J- Several v helpful answers to specific questions. Thanks! 
+
+Juli- Function inclusion and some Comp40 info. 
+
+Coby Formaggio! Gave me the idea of using == to compare #t and 1.
+This comparison worked as expected, (gave #f),but seemed an important
+edge case to check. 
+
+
+https://en.cppreference.com/w/cpp/error/assert
+On using assert() with not - formatting 
+
+https://www.geeksforgeeks.org/const-member-functions-c/
+On using const with member function definition- formatting 
+
+https://stackoverflow.com/questions/46719183/c-using-ifstream-to-read-file
+For ifstream clarification 
+
+https://www.cplusplus.com/reference/sstream/stringstream/
+For stringstream clarification. 
+
+README, .cpp files from HW1, HW2- formatting and headers 
+
+CalcYouLater Project Spec for commands list, which was parsed for Commands.txt. 
+
+
+                            ---- FILES ----
+NOTE: Piazza post @721 instructed to submit all testing files, including 
+provided ones, so I am. 
+
+RPNCalc.h:         
+        Implementation of RPNCalc class, which represents a calculator built 
+        from a stack of Datum instances. A new RPNCALC begins empty, and 
+        clients can then compile and run using the CalcYouLater program. The 
+        program is implemented as a stack, making simple access of the top 
+        element of the list of inputs a smooth, convenient, and intuitive 
+        process. 
+
+RPNCalc.cpp: 
+        Contains a variety of functions that operate on 
+        RPNCalc for convienence. They allow the CalcYouLater program 
+        to take integers, booleans, or rstrings from an input stream
+        (by default cin, using the command line, but can also be a file). 
+        Also allows for file reading within the program and several 
+        special commands. 
+
+To initialize an RPNCalc, start by calling the constructor. An RPNCalc can
+be constructed with no Datums as an empty stack. 
+
+After this, any function in the commands list, based on the functions in the 
+.cpp file, can be executed via keyboard input. 
+
+Each function specifies its parameters and is detailed with a function contract
+in the .cpp file. Please feel free to read over them! 
+
+DatumStack.h:
+        Implementation of DatumStack class, which represents a
+        stack of Datum instances. A new DatumStack may begin empty or be 
+        pre-filled, and clients can then add and remove Datums from the top 
+        of the stack, as well as access the top element and size and 
+        clear the stack. The stack is implemented as a vector, making
+        traversal and expansion easy and allowing the employment of 
+        useful vector helper functions. 
+
+DatumStack.cpp:
+        Contains a variety of functions that operate on 
+        DatumStack for convienence. They allow stacks to be constructed, 
+        added to, popped from, cleared, and tagged by their top element 
+        and size. 
+
+To initialize a stack, start by calling the constructor. A stack can be 
+constructed with 
+a. no Datums (empty stack)
+b. any number of Datums read in from an array. The size of the array 
+must also be provided. 
+After this, any function in the .cpp file can be executed on the list using 
+the dot operator (.)
+Each function specifies its parameters and is detailed with a function contract
+in the .cpp file. Please feel free to read over them! 
+
+DatumStack_tests.cpp:
+        Testing program for DatumStack.cpp. 
+        Tests each function detailed DatumStack.cpp file in multiple 
+        cases using unit_test, an operation detailed in the Makefile. 
+
+Datum.h: 
+        Implementation of Datum class. Allows for construction of integer, 
+        boolean, or rstring datums, as well as use of some helpful operators. 
+
+Datum.o: 
+        Compiled code for Datum class. 
+
+main.cpp: 
+        Driver for running CalcYouLater. Instantiates an RPNCalc instance. 
+
+rStringTest.cyl: 
+        A short file containing an rstring for testing parseRString()
+         with a file stream as an input. 
+
+test.cyl: 
+        A file to test all commands of CalcYouLater. Compile using ./cylc
+        and run within the program or by redirecting cin. 
+
+quit.cyl: 
+        A file to test quit command of CalcYouLater from within a file.
+        Compile using ./cylc and run within the program or by redirecting cin.
+
+quit2.cyl: 
+        A file to further test quit command of CalcYouLater from within a file.
+        Compile using ./cylc and run within the program or by redirecting
+        cin.      
+
+errors.cyl: 
+        A file to test all errors of CalcYouLater. Compile using ./cylc
+        and run within the program or by redirecting cin. 
+
+fib.cyl, fact.cyl, fib_debug.cyl, cylc: 
+        Provided files needed for compilation and testing. 
+
+Commands.txt: 
+        A full list of commands and meanings for CalcYouLater. 
+
+
+README: 
+        This file. 
+
+Makefile:
+        File containing code for unit_test, which allows for 
+        efficient testing of the program. Links the program to valgrind and
+        memcheck while it is being tested after compiling it. It also 
+        removes excecutables after testing is completed. Also contains 
+        rules for making .o files and CalcYouLater executable. 
+
+
+NOTE ON BUGS: No bugs were found in any of the final tests. All errors
+thrown by the testing program are safely caught. No function as 
+of yet tested has any non-documented limitations in the final (current) 
+iteration of the program, including valgrind errors. 
+
+                 ---- COMPILE / RUN INSTRUCTIONS ----
+Use "make CalcYouLater" to build a program that uses main to start a new 
+calculator simulation. 
+Input commands using the keyboard or redirect cin to a file. 
+
+Simply type "unit_test" to run the unit tests for the DatumStack
+class. This folder contains no driver, or application, besides the 
+unit tests for the list classes.
+
+
+
+                ---- DATA STRUCTURES / ALGORITHMS ---- 
+1. Vector-implemented Stack: 
+    This data structure is quite useful for storing data that can both remain 
+    static and expand and contract in by small amounts, provided the user 
+    is only interested in accessing the top element of the stack. As a simple 
+    data structure, it has the strength of not being overly complex, and 
+    use of stack helper functions make it a powerful tool for the RPN 
+    calculator. 
+
+                           ---- TESTING ----
+Starting note: I documented all of my testing, bugs, and breakthroughs in a 
+seperate document called THOUGHT_PROCESS. While it is not included in this 
+submission, I am happy to provide it upon request. The contents of 
+THOUGHT_PROCESS are detailed formally here. 
+
+
+Note on testing: I wrote tests as I went. After writing each function, I wrote 
+a test in DatumStack_tests for the function in the case of each of the 
+constructors (empty and multi Datum). For each function I describe below,
+if it is not mentioned that I wrote a test for it explicitly, I did while
+writing the code to make sure it worked. This seemed
+like a much more practical way of completing the program than doing all at 
+once and getting overflowing errors. I tested RPNCalc.cpp by making an instance 
+of the CalcYouLater each time and rigorously testing it using the keyboard 
+commands as I implemented them. I tested every edge case I could imagine, and 
+wrote several files to demonstrate my testing. These files can be run by 
+redirecting cin using: 
+./CalcYouLater < test.cylc 
+(for example)
+
+or using the built-in "file" command. 
+
+
+
+Second note on testing: When discussing the edge cases I used below for
+DatumStack, these involved attempting actions on an empty or cleared stack,
+including pop() and top(). All error cases were handled using throw and catch 
+with exceptions. Edge cases for RPNCalc.cpp involved running commands with 
+incorrect numbers or types of Datums on the stack, division and "mod" by zero,
+trying "==" on #t and 1 as well as on #f and 0,  
+nested rstrings, file execution within files, quitting in files followed by 
+commands, and incorrectly-formatted rstrings. Most of these tests 
+are demonstrated in the provided .cyl files. Compile them using 
+./cylc testing_file.cyl. 
+
+I also tested output rigorously against the reference implementation using 
+diff, using both cout and cerr redirection using "> &".  
+
+
+--- 
+    
+    Roger A. Burtonpatel 
+    3/04/2021 
+    Start of Project 1
+    I started by reading the spec several times, researching RPN calculators, 
+    playing with one online, and testing with the reference implementation. 
+
+    I then created all the necessary files for the project. 
+
+3/7/2021 
+I then made my implementation plan. Declared functions in DatumStack.h and 
+RPNCalc.h files and thought about how to write them. 
+
+3/9/2021 
+Went to OH for check-off and wrote functions for DatumStack.cpp, testing as
+I went using DatumStack_tests.cpp. Also wrote parseRString.cpp. 
+
+I began my DatumStack implementation. Plan for code: 
+1. Write out all functions within DatumStack.cpp. They are already declared in 
+DatumStack.h. 
+2. Fill in each function one at a time. Write a test for each as I go in 
+DatumStack_tests.cpp and test using unit_test. 
+3. Complete. 
+    
+
+I did so in about an hour and a half. Christopher Herr showed me how to use 
+throw and catch, which helped immensely in generating error messages for 
+functions that return a value, like top(). While unit testing, I found that
+printing to cerr in the case of an error in this function would cause valgrind 
+warnings and the test would not pass. Learning to throw and catch exceptions 
+was extremely valuable in this process and saved a lot of time. 
+
+I wrote one function in DatumStack.cpp at a time, with one or more functions 
+in DatumStack_tests.cpp per function in the class. Testing as I went, I found 
+most of my errors were from forgetting to update my private variable len within 
+the functions that pushed or popped from the stack. I tested using assert, and 
+finished efficiently after a rigorous testing process. 
+
+I had also previously written parser.cpp in around five minutes in lab. I had 
+implemented it recursively and was curious to see if it would stand under 
+rigorous testing. I found, while testing it with main.cpp and running 
+both cin inputs and custom filestream inputs, that it: 
+
+1. Always worked for an input from cin 
+2. Worked with a file input, provided the file excluded the first open brace. 
+
+If the original first brace is read in a file by the recursive function, 
+the final closing brace is replaced with an open brace. This is something 
+I'm still working on, and decided to avoid in my solution. 
+
+I assume that, by calling the function after an open brace is read in a file, 
+this issue will not arise. Just in case, I implemented an iterative outfit for 
+parseRString and would like to be graded on this one, since I know it works in 
+all cases. 
+
+
+IMPORTANT: As of 3/12/21, parseRString was implemented iterateively. 
+
+
+3/12/21 
+
+Started implementing RPNCalc.cpp. 
+
+I wrote run() first. run() will take in an input stream as a 
+parameter. 
+
+run() will use switch statements for each of its functions. 
+
+ALTERNATIVE: run() will call a private function that takes a stream 
+as its input 
+
+For ints, it will use got_int(). 
+
+string input; 
+int value; 
+if (got_int(input, &value)) {
+    Datum d(value); 
+    newDatumStack.push(d);
+}
+
+
+For math, pop the top two, use isInt() Datum helper function on them, and 
+then do some math. 
+
+
+Etc. 
+For file, open a filestream and execute run() private on the file stream.
+Will work? 
+Who knows, but recursion is dope! 
+
+
+I wrote functions and tested them with print statements. For example, 
+when taking in a value, I would print the value to cout. 
+
+3/13/2021 
+Implemented all simple commands. Started on complex commands. Used 
+print() for debugging. Tested vs reference implementation. 
+Also tested many commands on the same line. These included: 
+5 print drop print 
+Which yielded: 
+5
+Error: empty_stack
+
+NOTE: for ==, I tested 1 vs #t and - vs #f. 
+
+3/14/2021 Happy pi day! 
+
+Put parseRString into RPNCalc.cpp and implemented a way to 
+read rstrings. My plan was: 
+1. if (input == "{") 
+    make a new datum rstring using parseRString; 
+    newDatumStack.push(new datum); 
+2. for exec: 
+(error condition)
+    istringstream rstringstream(newDatumStack.top().getRString());
+    run_stream(rstringstream);
+
+
+
+It ran as expected, with some bugs. I fixed them alone and with some 
+help from a student (no code was shared, only abstract discussion).
+
+
+I had the idea to use } bracket to close while loop with a boolean, so 
+that ending an rstring would stop parseRString from parsing too much. 
+
+When deciding to quit using EXIT_SUCCESS or a boolean, I decided to use 
+a boolean since it was a cleaner, better-practice solution that would ensure 
+my destructors would run. 
+
+
+I had some questons: 
+1. parseRString() and gotint() copied into RPNCalc.cpp or #included as .h 
+files? A: Copied as private members. 
+2. Need to unit_test for RPNCalc.cpp or manual testing is fine? 
+Did detailed testing for MetroSim. A: Manual is good. 
+3. length() -5 vs 4? Why? A: All set. B/c added extra space. 
+
+
+Plan for if: 
+store the top three Datums as variables while popping them. 
+if bottom is not boolean, throw error. otherwise, store in var. pop either 
+way. Then read boolean var. If true, push first rstring and exec it. 
+If false, push 2nd rstring and exec it. 
+
+
+3/15/2021 
+Completed if(). Errors with file reads due to rstring parsing. For some reason,
+reading rstrings from file twice, resulting in 
+{
+{ rstring }
+
+instead of 
+{ rstring }
+
+Fixed error. Had to do with taking the input at the beginning of the while 
+loop. When reaching the end of the file, it executed the while loop one more
+time before "realizing" it was at eof() (or fail() in this case) and would 
+read the last input again- in this case, an open brace. This resulted in 
+an rstring in a file leaving an extraneous "{" at the top of the stack. 
+
+3/16/2021 
+Fully completed RPNCalc.cpp. I had been using testing files as I went, and 
+began to comment on them using % and compiling them using ./cylc. I ended with
+five testing files: 
+0. rstring.cyl 
+1. test.cyl 
+2. quit.cyl
+3. quit2.cyl 
+4. errors.cyl 
+
+3/17/2021
+
+I finished my README and submitted using provide. 
+    
+                         ---- TIME SPENT ----
+I would say I spent around 1-2 hours a day on phase 1 of the project, 
+starting on 3/4. This totalled to around 5 hours. I had an unexpected 
+personal conflict that greatly interfered with my schoolwork for several
+days in between; however, I managed to finish on time after resolving 
+the issue. 
+
+I spent roughly 15 hours on phase 2. Writing the functions took the most 
+time, while testing took around 3 hours and README writing took about 1.5. 
+    
+    Thanks for a super fun project! I loved this and felt I improved as a 
+    programmer because of it. 

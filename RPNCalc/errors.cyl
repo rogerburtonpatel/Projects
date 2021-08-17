@@ -1,0 +1,84 @@
+%%% errors.cylc 
+%%%
+%%%
+%%% Test of errors in CalcYouLator. Will print a string of errors to cerr.
+%%% The list is included here for your convenience. 
+%%% 
+%%% Usage: compile with: ./cylc errors.cyl
+%%% and run with "file" command or using cin redirect (<)
+%%%
+%%% Author: Roger A. Burtonpatel, Tufts University, Spring 2021
+%%%
+
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: datum_not_bool
+% Error: division by 0.
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: empty_stack
+% Error: datum_not_int
+% Error: empty_stack
+% Unable to read 3
+% hi: unimplemented
+% test: unimplemented
+% Error: datum_not_rstring
+% Error: cannot execute non rstring
+% { Did you print a bunch of errors? Nice! }
+
+
+print
+drop
+not
+swap
+1
+swap
+print
+2
+not
+8
+0
+/
+<
+>
+<=
+>=
+==
+1
+<
+2
+>
+3
+<=
+4
+>=
+5
+==
+{ 1 }
+2
++
+print
+{ 3 }
+file
+{ hi }
+exec 
+test 
+#t 
+6
+{ 7 }
+if 
+9 
+exec
+{ Did you print a bunch of errors? Nice! }
+print 

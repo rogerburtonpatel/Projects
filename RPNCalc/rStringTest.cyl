@@ -1,0 +1,10 @@
+%%% rStringTest.cyl 
+%%% Tests a nested rstring through a file. 
+%%% Simply pushes the rstring onto the stack. 
+%%%
+%%% Usage: compile with: ./cylc quit.cyl
+%%% and run with "file" command or using cin redirect (<)
+%%%
+%%% Author: Roger A. Burtonpatel, Tufts University, Spring 2021
+
+{ 1 { 4 2 / } / }

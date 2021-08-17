@@ -1,0 +1,130 @@
+4/17/2021
+Read over spec and made a plan. 
+
+4/20/2021 
+Completed Plan. 
+
+0. BFS: 
+- Clear metadata
+- Check if artists are in graph 
+- make an int distance to be incremented 
+a. Take the vertex start in the graph and mark 'visited' as false for all. Mark 'visited' as
+true for starting point 
+Using get_vertex_neighbors: 
+b. Make a queue for the neighbor vertices. Enqueue the starting vertex. 
+Set predecessor to none. 
+c. While queue is not empty and 
+- Enqueue vertex and put it in a vector. Set its predecessor. 
+ If == dest; return it and stop. 
+FOR report_path: 
+Stack up the vector and return the stack.  
+- If neighbor of vertex is not visited, mark it as visited and enqueue it. 
+
+1. DFS: 
+- Clear metadata 
+- Check if artists are in graph 
+a. Take the vertex graph and mark 'visited' as false for all. Mark 'visited' as
+true for starting point 
+Set predecessor to none for start, otherwise to 'previous' input   
+if vertex == dest; 
+return vertex; 
+else 
+Using get_vertex_neighbors: 
+b. for (vertex.neighbors)
+- if not visited; 
+- run DFS(neighbor, previous)
+FOR report_path: 
+Stack up the vector and return the stack.  
+
+2. NOT: 
+- Clear metadata 
+- Check if artists are in graph 
+a. Use DFS, except add condition 
+-if not visited && not == [artist to exclude]
+- run DFS(neighbor, previous)
+
+HOW THE GRAPH IS REPRESENTED: 
+The graph is represented as a vector of struct vertices with a corresponding 
+vector of struct edges. Each vertex has a list of neighbors.
+
+Drawing edge cases: 1 neighbor, no neighbors, artist not in graph
+
+FUNCTIONS: 
+SixDegrees(artist_list_ifstream, output_list_ostream, command_list_ifstream);
+Constructs SixDegrees simulation w various parameters provided in main 
+BFS(Artist source, Artist dest));
+Does the breadth-first search and sets predecessors 
+DFS(Artist source, Artist dest);
+Does the depth-first search and sets predecessors 
+not(Artist source, Artist dest);
+Does the exclusive depth-first search and sets predecessors 
+print_entire_graph()
+prints the whole graph
+## PopulateGraph() IN COLLABGRAPH - create seperate vector to check against songs 
+## Populates the graph based on artist ifstream. 
+
+run_sim_2()
+runs SixDegrees with 2 arguments (no commands)
+run_sim_3()
+runs SixDegrees with 3 arguments (commands file provided)
+
+
+TIMELINE: 
+Do report_path(); get_vertex_neighbors() today; test and write main(). Submit. 
+Friday: SixDegrees BFS and DFS 
+Sunday-Monday: SixDegrees PopulateGraph, print. Also start modularizing for 
+commands and output. 
+Tues-Weds: final tests and submit Weds at noon (6 hr before deadline for 
+breathing room).
+
+
+Keep a tab on @972
+
+@1074 and discuss O(N) for unordered map with hash collisions or not 
+@1067 for printing quotation marks 
+
+Ordering output, command, input concisely 
+
+@1079 look at if queue or stack issue 
+
+
+TESTS: 
+bfs 
+two artists w a direct path 
+two artists w longer path 
+two artists with no path
+using diff 
+
+
+dfs 
+two artists w a direct path 
+two artists w longer path 
+two artists with no path 
+not using diff (explain why)
+
+
+not
+two artists w a direct path, excluding no one 
+two artists w a direct path, excluding one other EDGE
+two artists w a direct path, excluding several others EDGE
+two artists w longer path, excluding no one EDGE
+two artists w longer path, excluding one other
+two artists w longer path, excluding several others 
+two artists w no path, excluding none EDGE
+two artists w no path, excluding one other 
+two artists with no path, excluding several 
+
+two artists w direct path, excluding either artist 
+two artists w longer path, excluding either artist
+two artists with no path, excluding either artist 
+using diff 
+ALL EDGE 
+
+print 
+using diff 
+
+
+quit from a command file EDGE DONE
+exit from an ending command file EDGE DONE 
+not command from command file without * EDGE
+all using diff 

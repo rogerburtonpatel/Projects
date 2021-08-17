@@ -1,0 +1,30 @@
+%%% quit.cyl 
+%%% Tests "quit" within a file. 
+%%% Will execute some simple commands and quit the entire program. Will print: 
+%%% 5
+%%% { 1 2 3 }
+%%% -1 
+%%% 
+%%% to cout and 
+%%% Thank you for using CalcYouLater. 
+%%%
+%%% to cerr. 
+%%% 
+%%% Usage: compile with: ./cylc quit.cyl
+%%% and run with "file" command or using cin redirect (<)
+%%%
+%%% Author: Roger A. Burtonpatel, Tufts University, Spring 2021
+%%%
+
+% For your convienence: The top item of the stack at any given time. 
+%
+
+            % Top: 
+5           % 5
+print       % 5 
+{ 1 2 3 }   % { 1 2 3 }
+print       % { 1 2 3 }
+exec        % 3 
+-           % -1 
+print       % -1 
+quit        
