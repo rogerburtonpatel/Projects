@@ -1,8 +1,0 @@
-ok so
-1. Set up constants.
-2. Get a board going. 1st 2d, then 1d for 1st submission
-3. Implement commands.
-4. Random number generation + spot placement (extra credit 1)
-5. THE HARD PART 1: Moving the shit
-6. THE HARD PART 2: Adding the shit
-7. EC 2
