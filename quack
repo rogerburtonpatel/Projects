@@ -1,0 +1,419 @@
+#!/bin/bash
+
+##
+## Quack.bash
+## 
+##
+## QUACK- Queue + Stack or Query Ubiquitously Accepting Custom Kibbitzing
+##
+## Author: Roger A. Burtonpatel 
+## 
+## Usage: ./Quack.bash
+## commands: see command table below in print_commands()
+## 
+
+
+# UNCOMMENT IF USING 
+# Argument parser (From tldp.org's Advanced Bash Scripting Guide,
+# with edits by Author)
+
+#if [ ! -n "$1" ]
+#then
+#	echo -n "Usage: `basename $0` Old file," \
+#		                   "directory_to_search2, etc."
+#	echo
+#	exit $E_BADARGS
+#fi
+
+
+########################################################
+# From jesse_b on Stack Overflow
+if [[ ! -e /home/$USER/Today.txt ]]
+then
+	echo "Looks like you don't have a \"Today\" file."
+	echo -n "I'll go ahead and create one for you."
+	touch /home/$USER/Today.txt
+fi
+
+if [[ ! -e /home/$USER/Completed.txt ]]
+then
+	echo "Looks like you don't have a \"Completed\" file."
+	echo -n "I'll go ahead and create one for you."
+	touch /home/$USER/Completed.txt
+fi
+#######################################################
+
+# main()
+# parameters: none
+# returns: none 
+# purpose: executes main command loop with some initial printings.
+main () {
+	clear
+	echo 'TODO: DOCUMENT LAST AND MAKE CLEAR LIKE PRINT'
+	echo 'TODO: FUNCTIONALIZE AND ADD SIDE FX TO LAST' 
+	echo; echo 'Welcome to QUACK!'; echo
+	print_commands
+	print_quack "TODAY'S" "/home/$USER/Today.txt"
+	the_Quack
+	echo 'Bye!'
+} 
+
+# print_commands()
+# parameters: none
+# returns: none 
+# purpose: prints a block of commands 
+print_commands () {
+
+	echo 'Please enter a command:'
+
+	echo '"enqueue" to enqueue task at end of quack'        
+	echo '"chop" to remove the last task in the quack'
+	echo '"push" to add task to top of quack' 
+	echo '"pop" to pop top task off of quack'
+	echo '"remove" to remove a task by name (input)'
+	echo '"import" to import all of your old tasks'         
+	echo '"export" to make Today'\''s tasks old and clear them'
+	echo '"clear" to clear Today'\''s QUACK'
+        echo '"clearold" to clear and old QUACKs'
+	echo '"print" to print Today'\''s QUACK, Old tasks, or Completed items'
+	echo '"help" for commands'
+	echo '"quit" to quit!' 
+
+}
+
+# print_quack()
+# parameters: none
+# returns: none 
+# purpose: prints out the QUACK of /home/$USER/Today.txt, with formatting.
+print_quack () {
+	echo; echo "$1 TASKS:"
+        echo "--------------------------------------"
+        cat $2
+        echo "--------------------------------------"; echo
+}
+
+# is-complete()
+# param: a string task name, a command name to run- chop, pop, remove, and an 
+# 	 optional filename for remove 
+# returns: none
+# purpose: gives the user an option to mark a task as 
+# complete or incomplete when they remove it via 
+# chop, pop, or remove.
+is-complete() { 
+	if [[ "$2" == "remove" && $(grep -w "$1" "$3" | wc -l) == "0" ]]; then
+		clear
+		echo "Task \"$1\" not found in ${3}!"; return	
+	fi
+
+	if ! [[ "$3" == "/home/$USER/Completed.txt" ]]; then 
+	echo "Completed \"$1\"? Press 1, 2, or 3."
+	select yn in Yes No Cancel; do
+		case $yn in
+	
+		"Yes") "$2" "$1" "$3"; clear
+		echo "Added \"$1\" to list of Completed tasks!"
+		echo $1 >> /home/$USER/Completed.txt 
+		break;;
+
+		"No") "$2" "$1" "$3"; clear
+			echo "Ok! Get it done if you need to :)"
+			break;;
+
+		"Cancel") clear; echo "Ok. Task will remain."; break;;
+
+		*) echo "Invalid input. Try again.";; 
+
+		esac
+	done	
+	else
+		"$2" "$1" "$3"
+	fi	
+}
+
+
+# enqueue() 
+# param: a task string
+# returns: none 
+# purpose: enqueues inputted task at bottom of the QUACK
+enqueue () {
+	echo $1 >> /home/$USER/Today.txt	
+}
+
+# chop()
+# param: none
+# returns: none 
+# purpose: prompts user with option to indicate if they 
+# finished the chopped task. if "Yes" or "No," chops it
+# (putting it in /home/$USER/Completed.txt if "Yes"), and does nothing
+# on "Cancel.
+# side effects: can remove bottom line of /home/$USER/Today.txt and
+# add a line to /home/$USER/Completed.txt
+chop () {
+	sed -i '$d' /home/$USER/Today.txt
+}
+
+
+# push() 
+# param: a task string
+# returns: none 
+# purpose: pushes inputted task to top of the QUACK
+push () {
+# sed command does not work on empty file; this
+# catches that case 
+	if [ "$(wc -l /home/$USER/Today.txt)" == "0 /home/$USER/Today.txt" ]; then
+		echo $1 >> /home/$USER/Today.txt 
+	 
+	else
+	# Writes line 1 to be task	
+	sed -i "1i ${1}" /home/$USER/Today.txt
+	fi 	
+}
+
+
+# pop()
+# param: none
+# returns: none 
+# purpose: prompts user with option to indicate if they 
+# finished the popped task. if "Yes" or "No," pops it
+# (putting it in /home/$USER/Completed.txt if "Yes"), and does nothing
+# on "Cancel.
+# side effects: can remove top line of /home/$USER/Today.txt and
+# add a line to /home/$USER/Completed.txt
+pop () {
+	sed -i '1d' /home/$USER/Today.txt
+}
+
+# remove()
+# param: a task name, a filename to remove from
+# returns: none 
+# purpose: removes a selected task from quack 
+# side effects: removes one or all instances of 
+# a task from /home/$USER/Today.txt, /home/$USER/Old.txt, or /home/$USER/Completed.txt.
+remove() {
+	# check if task is in /home/$USER/Today.txt; return boolean
+	local instance 
+	if [[ $(grep -w "$1" "$2" | wc -l) == "1" ]]; then
+		instance="a" # delete all if there's only 1
+	        clear	
+	
+	else    # must be more than one instance of task to reach this block
+		# let user choose which instance of a task to remove
+		echo 'Delete first instance [f],'
+		echo 'last instance [l],'
+		echo 'or all instances [a]?'
+		read instance
+		clear	
+	fi
+
+	case $instance in 	
+	  f)
+  	  # finds all line numbers of 
+	  # exact match to specified task,
+	  # clips only the top one (first instance),
+          # and removes that line.
+	  sed -i "$(sed -n "/^$1$/=" "$2" | head -n 1)d" "$2" ;;
+	  l)
+	  # same method as above, but uses tail 
+	  # to cut last instance. 
+	  sed -i "$(sed -n "/^$1$/=" "$2" | tail -1)d" "$2" ;;
+	  a)
+	  # removes all lines on which exact
+	  # match of $task is found.
+	  sed -i "/^$1$/d" "$2" ;;
+	  *)
+	  clear
+	  echo "option \"$instance\" not found, sorry!" ;;
+	
+  	esac	
+}
+
+# the_Quack() 
+# parameters: none 
+# returns: none 
+# purpose: implementation of command loop. 
+# 	   accepts commands and performs tasks accordingly.
+#	   runs until user inputs "quit".
+the_Quack () {
+	# reads first command, then goes to command loop. 
+	local command_
+	local task
+
+	echo -n ">> " && read command_
+	echo
+	# start of commmand loop
+	while [ "$command_" != "quit" ]
+	do
+ 
+	case "$command_" in
+		
+		
+		enqueue)
+			echo "Enter task name:"
+			read task
+			enqueue "$task"
+			clear
+			;;
+
+		chop)
+			if [ "$(wc -l /home/$USER/Today.txt)" == "0 /home/$USER/Today.txt" ]; then
+				clear; echo "Nothing to chop!"
+			else
+				is-complete "$(tail -n 1 /home/$USER/Today.txt)" "chop"
+			fi
+			;;
+
+		push)
+			echo "Enter task name:"
+			read task
+			push "$task"
+			clear
+			;;
+
+		pop)
+			if [ "$(wc -l /home/$USER/Today.txt)" == "0 /home/$USER/Today.txt" ]; then
+				clear; echo "Nothing to pop!"
+			else
+				is-complete "$(head -n 1 /home/$USER/Today.txt)" "pop"
+			fi
+			;;
+	
+		# complicated command with a couple cases. 	
+		remove)
+			echo 'Enter task name:'
+			read task
+			echo 'Remove from? Press 1, 2, or 3.'
+			local list_name
+			select list_name in Today.txt Old.txt Completed.txt; do
+				if ! [[ "$list_name" =~ ^(Today.txt|Old.txt|Completed.txt)$ ]]; then
+					echo "Invalid input. Please try again." 
+				else 	
+					is-complete "$task" "remove" "/home/$USER/$list_name"; break
+				fi
+				if [[ "$list_name" == "Completed.txt" ]]; then 
+					echo "$task removed from ${list_name}!"
+				fi
+			done	
+			;;
+		# confirms user meant to use command, then copies
+		# all old tasks from /home/$USER/Old.txt to /home/$USER/Today.txt. 
+		import)
+			echo "Sure you want to import old tasks? Y/N"
+			local response 
+			read response
+		        clear	
+			case $response in 
+				Y | y | Yes | yes)
+				if [[ ! -e /home/$USER/Old.txt ]]
+				then
+				        echo; echo "No old tasks to import!"
+					echo "file \"/home/$USER/Old.txt\" needed."
+				else
+					cat /home/$USER/Old.txt >> /home/$USER/Today.txt
+					echo; echo "Old tasks successfully imported!" 
+				fi
+				;;
+
+				N | n | No | no)
+				echo; echo "Gotcha. We won't import them."
+			        ;;	
+			esac
+			;;
+	   	
+		# confirms user meant to use command, then copies
+		# all of Today's tasks from /home/$USER/Today.txt to /home/$USER/Old.txt.
+		# Gives the user an option to clear /home/$USER/Today.txt. 	
+		export)
+			echo "Sure you want to export today's tasks to be old? Y/N"
+			local response 
+			read response 
+
+			case $response in 
+				Y | y | Yes | yes)
+				if [[ ! -e /home/$USER/Old.txt ]]
+				then
+				        touch /home/$USER/Old.txt
+					echo; echo "File \"/home/$USER/Old.txt\" created for old tasks."
+				fi
+					cat /home/$USER/Today.txt >> /home/$USER/Old.txt
+					echo; echo "Today's tasks successfully exported to /home/$USER/Old.txt!" 
+				command_="clear"
+				continue
+				;;
+
+				N | n | No | no)
+				echo; echo "Gotcha. No export executed."
+			        ;;	
+			esac
+			;;
+
+		clear)
+			echo "Sure you want to clear today's tasks? Y/N"
+			echo; echo "WARNING: You cannot recover tasks cleared this way,"
+		        echo "unless they are backed up in your Old tasklist."
+			local response 
+			read response 
+			clear
+			case $response in 
+				Y | y | Yes | yes)
+				: > /home/$USER/Today.txt
+					echo; echo "Cleared today's tasks." 
+				;;
+
+				N | n | No | no)
+				echo; echo "Gotcha. Not clearing today's tasks."
+			        ;;
+				*) 
+				echo "Invalid option. Won't clear anything."	
+			esac
+
+			;;
+
+		clearold)
+			echo "Sure you want to clear Old tasks? Y/N"
+		        echo -n "WARNING: You cannot recover tasks cleared this way."
+			local response 
+			read response 
+			clear
+			case $response in 
+				Y | y | Yes | yes)
+				: > /home/$USER/Old.txt
+					echo; echo "Cleared old tasks." 
+				;;
+
+				N | n | No | no)
+				echo; echo "Gotcha. No clearance of old tasks."
+			        ;;	
+			esac
+
+			;;
+		# print merely passes using : 
+		# since the loop prints every time.
+		# cheap and works. 
+		print)
+			echo "Print QUACK, Old Tasks, or Completed Tasks? Press 1, 2, or 3."
+			select option in QUACK Old Completed; do
+				case $option in
+				"QUACK") clear; break;; 
+				"Old") clear; print_quack "OLD" "/home/$USER/Old.txt"; break;;
+				"Completed") clear; print_quack "Completed" "/home/$USER/Completed.txt"; break;;
+				*) echo "Invalid input. Try again.";; 
+				esac
+			done
+			;;
+		
+		help) 
+			clear
+			print_commands
+			;;
+		*)
+			clear
+			echo "command \"$command_\" not found, sorry!"
+	esac
+		print_quack "TODAY'S" "/home/$USER/Today.txt"
+		echo '"help" to print commands'	
+		echo -n ">> " && read command_
+		echo
+	done
+}
+# don't forget to call main()! 
+main
