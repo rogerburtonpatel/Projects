@@ -1,0 +1,4 @@
+Available on request; see README.md.
+
+An implementation of a version of Scheme, written in SML. Implements a full type inference 
+system for the scheme-like language. 
