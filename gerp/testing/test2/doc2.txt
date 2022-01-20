@@ -1,0 +1,4 @@
+Here is a line of doc2.  
+Here is another line of doc2. 
+Line 3 of doc2 lies here. 
+Now we are done.

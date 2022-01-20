@@ -1,0 +1,233 @@
+12/28 
+Read spec 
+wrote FSTreeTraversal and stringProcessing
+12/29
+writing design doc
+12/30
+hashing- writing pairHashTable and realizing I needed a tripHashTable, 
+which stores indeces to a vector of full string lines. see planning below 
+1/3/2022
+new planning and restructuring. now using unordered_sets to store wordPods. 
+1/6/2022
+implemented lots of this. now also using a vector of filepaths with wordpods 
+storing indeces to the vector to save space. 
+1/9/2022
+Working on more saving of space. 
+1/10/2022
+Used regular sets to interesting results. 
+Now trying sets within wordpods. Big revamp. 
+1/11/2022
+Going back to unordered_sets and spoke w/ Milod about optimization. 
+
+NEED: 
+
+gerp program: 
+    main.cpp
+    gerp.cpp
+    gerp.h 
+    Makefile 
+    README
+    a hash table implementation 
+    
+[add]
+
+notes 
+- use -O2 flag in makefile
+
+
+DONE 
+FSTreeTraversal: 
+    FSTreeTraversal.cpp
+    -- program prints paths from directory. 
+    -- We want it to return a vector thereof. 
+    -- need it for the tripHashTable
+stringProcessing: 
+    stringProcessing.cpp
+    stringProcessing.h
+    -- returns the nice string. 
+    -- need it for gerp, which will feed the strings to the tripHashTable as 
+        keys to fetch the words.  
+
+
+PIPELINE: 
+
+1. RUN:                         directory fed to FSTreeTraversal via main.cpp
+                                main also opens the outputfile. 
+                                         |
+2. FILE PROCESSING:             FSTreeTraversal fetches all files
+                                within main via the passed directory. 
+                                Puts them in a vector as strings by 
+                                returning said vector. 
+                                         | 
+3. GET WORDS, LINES, FILENAMES     main opens the files 
+                                   and stores the streams in a vector. 
+                                   [ALTERNATIVE main passes the filenames 
+                                   right to the gerp object as a vector 
+                                   of strings.]
+                                         | 
+                                   main passes the vector to gerp object. 
+                                   gerp reads each word while 
+                                   storing its line number. 
+                                   [ALTERNATIVE gerp opens the files, one 
+                                   by one, from the vector].
+                                         |
+3.5. SEPARATING LINES FROM WORDS  gerp begins the almighty read_all() function.
+            - create ONE vector which will hold 
+                ALL of the lines. 
+            - create ONE index variable which keeps 
+                track of where we are in this big 
+                vector. pass it by REFERENCE so it is updated throughout 
+                read_all()
+        - for each filename in the vector:  
+            - read_one(filename, size_t &index, vector &fulllines)
+            put filename in vector of filenames; 
+            keep track of index; 
+            int linenumber = 0;
+            for every line: 
+                string fullline = "";
+                for every word in the line: 
+                    if word not in fullline:
+                        fullline += word;
+                        hash.insert(word, fileindex, linenumber, index);
+                fullines.push_back(fullline);
+                linenumber++;
+                index++;
+
+4. INDEXING THE 3 VALUES           gerp feeds 
+    AS A KEY AND A (TRIPLE VALUE)    {(key)word, 
+                                        (value){fileindex, linenumber, index}}
+                                   to tripHashTable as insertions. 
+
+5. QUERY PROMPT                     gerp handles queries. 
+                                    read some number of commands, using 
+                                    metrosim-like cin parsing. 
+                                    use else for anystring, if for @i, @q, 
+                                    @f etc. 
+
+                                    a.       AnyString 
+                                                | 
+                                    validated by stringProcessing
+                                                | 
+                                    sent to pairHashTable as a key. 
+                                    value piped to outputfile with 1st, 2nd 
+                                    parsing. 
+
+                                    b. @i or @insensitive AnyString
+                                        see cpp resource on how to case 
+                                        desensitize. otherwise same 
+                                        as above. 
+                                    c. @f newOutPutfile
+                                        close the old file. open a new one. 
+                                        replace the stream. continue. 
+                                    d. @q or @quit 
+                                        set a boolean flag to false and 
+                                        end the program. 
+                                    
+
+MODULAIRTY 
+main: 
+    TAKES: directory name, outputfile name. 
+    RETURNS: 0 or exits on badargs failure. 
+    PURPOSE: builds and runs [[gerp]]. 
+    DETAILS: 
+    a. opens outputfile 
+    b. calls [[FSTreeTraversal]] on directory
+    c. passes vector from b to an instantiated [[gerp]] object. 
+
+FSTreeTraversal: 
+    TAKES: directory name from [[main]] 
+    RETURNS: vector of file paths as strings. 
+    PURPOSE: gets all file paths from parent dir and sends them to [[main]]
+             to be opened and later used by [[gerp]]
+    DETAILS: 
+        a. reads in a directory from [[main]] and returns a vector of the files. 
+
+gerp: 
+    TAKES: a vector of filenames 
+            and an outputfile stream. 
+    RETURNS: nothing. 
+    PURPOSE: principal program, which indexes the dir via [[pairHashTable]]
+                and reads in queries from the loop it contains. 
+    DETAILS: 
+    a. reads in:
+     a vector of filenames
+     an outputfile stream to write to 
+        and processes every word every file in the vector. 
+        - opens them all within read_all()
+    b. gets line number of those words and pairs them with indeces to filenames
+        and indeces to full lines as tuple values 
+    c. sends the words as keys tuples as values to [[tripHashTable]]
+    d. begins a command loop which:
+        - reads in queries and sends relevant requests to [[tripHashTable]]
+        after passing words through [[stringProcessing]]. [[tripHashTable]]
+        returns [[wordPod]]s for formatting
+        - also can open new files. 
+        - can end via @q
+
+stringProcessing: 
+    TAKES: a string from a [[gerp]] query
+    RETURNS: a parsed string. 
+    PURPOSE: validate [[gerp]] queries. 
+    DETAILS: 
+            a. takes [[gerp]] queries and returns validated strings, to 
+                    in turn be sent as keys to [[pairHashTable]]
+
+tripHashTable: 
+    TAKES: keys (string words) and values --
+                    tuples of (size_t fileindex, int linenumber, size_t index)
+                    stored as struct [[wordPod]]s
+            which come from [[gerp]] indexing. 
+            to store in table. then takes keys (string words) from queries 
+            within [[gerp]]
+    RETURNS: ultimately, [[wordPod]]s: value tuples of 
+                        (size_t fileindex, int linenumber, size_t index)
+    PURPOSE: the hash table used by [[gerp]] for constant-time access to 
+              word locations.  
+    DETAILS: 
+            a. accepts [[wordPod]]s: key-value triples of 
+                        {word, (fileindex, linenumber, index)} 
+                generated by [[gerp]]
+            b. then reads in keys from query loop within [[gerp]] and returns 
+                [[wordPod]] value, which is parsed by [[gerp]] 
+                into desired output. 
+
+wordPod: 
+    TAKES: (value) fileindex, linenumber, index. 
+    RETURNS: an object of the three. 
+    PURPOSE: package to store in the tripHashTable and use by gerp. 
+    DETAILS: a nice little struct to store all our items. 
+
+MISC
+typo in spec pg 8- ./grep and ./the_grep should be gerp 
+page 9: fix that HW5 thing 
+
+
+Time logging: 
+FSTreeTraversal: 19 minutes, most of which was spent re-writing to optimize
+                 readability and performance. 
+stringProcessing: 9+30 minutes, largely spent fixing a tricky bug with erasing 
+                  from a string within a for loop (the indeces get messed up).
+design: 5:37-5:56, 9:38-10:27 for design and setting up directories. 
+pairHashTable: 3:00 - 5:00 
+restructuring: 9:05 - 9:10, 9:30 - 10:30
+
+--- WAS ONLY ABLE TO LOG 5.5 ---
+gerp: 11:23 - 12:27, 1:00 - 2:50
+unordered_sets and optimization: 12:11 - 1:30
+gerp: ~3.5 hrs
+re-optimization: 15 min + 8:42 - 9:50
+big op day: 2 - 5
+references: 4 - 5
+new storage: 5-6:20, 
+NOTE: hashNodes of (word, set of wordpods [3 size_ts])
+insert- hash the word, go to index, 
+if nullptr, make a node and plop it on the front. 
+otherwise, search down the linked list for that word 
+if you find it, put the pod in that node's set. 
+recurse. (or use while, tbd, recursive probably better)-- yes, recurse. 
+this way we only store each word once, + the whole dataset in a vector. 
+CHECK OLD implementation printing the allLines. 
+that's all! 
+check phone notes 
+
+Total: 
