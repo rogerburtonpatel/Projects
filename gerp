@@ -1,0 +1,7 @@
+TUFTS_CS
+
+Available on request; see README.md.
+
+An implementation of grep in C++. Indexes directories and searches 
+through them. Functions slightly differently from actual grep, but performs 
+very quickly. 

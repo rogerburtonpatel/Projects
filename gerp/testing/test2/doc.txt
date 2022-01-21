@@ -1,4 +1,0 @@
-Here is a line of doc.  
-Here is another line of doc. 
-Line 3 of doc lies here. 
-Now onto the next file. 
